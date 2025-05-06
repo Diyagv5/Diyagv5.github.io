@@ -49,19 +49,31 @@ title: DnA Photography # Or your preferred site title for the browser tab
     display: none; /* videos are hidden by default */
   }
 
-  /* Basic gallery styles (you'll want to improve this) */
-  .gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Space between items */
-    justify-content: center;
-  }
-  .gallery img, .gallery .video-placeholder {
-    width: 200px; /* Adjust as needed */
-    height: 150px; /* Adjust as needed */
-    object-fit: cover;
-    border: 1px solid #eee;
-  }
+  /* Improved Gallery Styles */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px; /* Space between items */
+  padding: 15px; /* Padding around the gallery */
+}
+
+.gallery img {
+  width: 100%; /* Make image take full width of its grid cell */
+  height: 200px; /* Set a fixed height, or use aspect-ratio for responsive height */
+  object-fit: cover; /* Crop to fit, maintaining aspect ratio */
+  border: 1px solid #ddd;
+  border-radius: 4px; /* Slightly rounded corners */
+  display: block; /* Remove extra space below image */
+  transition: transform 0.3s ease-in-out; /* For smooth hover effect later */
+}
+
+/* For the hover effect */
+.gallery img:hover {
+  transform: scale(1.05); /* Make image 105% of its size on hover */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Optional: add a slight shadow */
+  z-index: 10; /* Optional: bring it to the front if overlapping */
+  position: relative; /* Needed for z-index to work properly in some cases */
+}
   .video-placeholder { /* For video placeholders */
     background-color: #ddd;
     display: flex;
