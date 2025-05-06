@@ -1,6 +1,7 @@
+
 ---
 layout: page
-title: DnA  # Or your preferred site title
+title: heheheee # Or your preferred site title
 # subtitle: "My Portfolio"
 ---
 
@@ -19,9 +20,10 @@ title: DnA  # Or your preferred site title
     max-width: none !important;
   }
 
-  /* --- Cover Section --- */
+  /* --- Cover Section (Commented out if no image) --- */
+  /*
   .cover-section {
-    height: 70vh;
+    height: 70vh; 
     background-size: cover;
     background-position: center center;
     display: flex;
@@ -29,12 +31,13 @@ title: DnA  # Or your preferred site title
     justify-content: center;
     text-align: center;
     color: white;
-    background-image: url('/assets/img/your-cover-image.jpg'); /* <-- IMPORTANT: REPLACE THIS PATH */
-  }
+    background-image: url(''); /* No image path specified */
+  /* }
   .cover-section h1 {
     font-size: 3em;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
   }
+  */
 
   /* --- Content Switcher --- */
   .content-switcher {
@@ -121,7 +124,7 @@ title: DnA  # Or your preferred site title
     border: 3px solid white;
     box-shadow: 0 0 25px rgba(0,0,0,0.5);
   }
-  .lightbox-close-btn { /* This class is for the <span> */
+  .lightbox-close-btn { 
     position: absolute;
     top: 15px;
     right: 25px;
@@ -145,9 +148,12 @@ title: DnA  # Or your preferred site title
   }
 </style>
 
+<!-- Cover Section HTML (Commented out if no image/title wanted here) -->
+<!--
 <div class="cover-section">
-  <!-- <h1>DnA Photography</h1> -->
+  <h1>Your Site Title Here (Optional)</h1>
 </div>
+-->
 
 <div class="content-switcher">
   <button id="show-photos-btn" class="active">Photos</button>
@@ -161,9 +167,7 @@ title: DnA  # Or your preferred site title
     {% assign image_files_sorted = image_files | sort: "name" %}
     {% for image in image_files_sorted %}
       {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
-        {% unless image.path contains 'your-cover-image.jpg' %} {# <-- IMPORTANT: REPLACE 'your-cover-image.jpg' or remove this line if not needed #}
-          <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
-        {% endunless %}
+        <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
       {% endif %}
     {% endfor %}
     {% if image_files.size == 0 %}
@@ -181,11 +185,12 @@ title: DnA  # Or your preferred site title
 
 <!-- Simple Lightbox Structure -->
 <div id="lightbox-overlay" class="lightbox-hidden">
-  <span id="lightbox-close" class="lightbox-close-btn">×</span> {/* Changed class to id for JS targeting */}
+  <span id="lightbox-close" class="lightbox-close-btn">×</span>
   <img id="lightbox-image" src="" alt="Enlarged photo">
 </div>
 
 <script>
+// Same JavaScript as before
 document.addEventListener('DOMContentLoaded', function() {
     // --- Photo/Video Switcher Logic ---
     const photosBtn = document.getElementById('show-photos-btn');
@@ -216,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Simple Lightbox Functionality ---
     const lightboxOverlay = document.getElementById('lightbox-overlay');
     const lightboxImage = document.getElementById('lightbox-image');
-    const lightboxCloseBtn = document.getElementById('lightbox-close'); // Targeting by ID now
+    const lightboxCloseBtn = document.getElementById('lightbox-close');
     const photoGallery = document.querySelector('#photos-content .gallery');
 
     function openLightbox(imgSrc) {
@@ -235,26 +240,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (photoGallery) {
         photoGallery.addEventListener('click', function(event) {
             if (event.target.tagName === 'IMG') {
-                event.preventDefault(); // Good practice
+                event.preventDefault();
                 openLightbox(event.target.getAttribute('src'));
             }
         });
     }
 
-    if (lightboxCloseBtn) { // Check if the element exists
+    if (lightboxCloseBtn) {
         lightboxCloseBtn.addEventListener('click', closeLightbox);
     }
     
-    if (lightboxOverlay) { // Check if the element exists
+    if (lightboxOverlay) {
         lightboxOverlay.addEventListener('click', function(event) {
-            // Only close if the click is on the overlay itself, not the image
             if (event.target === lightboxOverlay) { 
                 closeLightbox();
             }
         });
     }
 
-    // Keyboard navigation: Close lightbox with Escape key
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
             closeLightbox();
