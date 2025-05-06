@@ -7,6 +7,45 @@ title: DnA Photography # Or your preferred site title for the browser tab
 <style>
   /* Basic styles for the new layout - we can move this to custom.css later */
   /* Target the theme's column container to make it full width */
+/* Lightbox Styles */
+#lightbox-overlay {
+  position: fixed; /* Stay in place during scroll */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* Dimmed background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it's on top of everything */
+  opacity: 0; /* Initially transparent */
+  visibility: hidden; /* Initially hidden and not interactive */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#lightbox-overlay.lightbox-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#lightbox-image {
+  max-width: 90%;   /* Image won't exceed 90% of viewport width */
+  max-height: 90%;  /* Image won't exceed 90% of viewport height */
+  object-fit: contain; /* Ensure entire image is visible, no cropping */
+  border: 3px solid white;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+  line-height: 1;
+}  
 main.container-md > .row > .col-xl-8.offset-xl-2.col-lg-10.offset-lg-1, /* More specific selector */
 main.container-md > .row > div[class*="col-"] { /* Broader selector if the classes change slightly */
   max-width: none !important;
@@ -147,7 +186,7 @@ main.container-md {
 
       {% for image in image_files_sorted %}
         {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
-          <img src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
+          <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
         {% endif %}
       {% endfor %}
 
@@ -168,31 +207,87 @@ main.container-md {
   </div>
 </div>
 
+<div id="lightbox-overlay" class="lightbox-hidden">
+  <span class="lightbox-close-btn">×</span>
+  <img id="lightbox-image" src="" alt="Enlarged photo">
+</div>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // --- Photo/Video Switcher Logic ---
     const photosBtn = document.getElementById('show-photos-btn');
     const videosBtn = document.getElementById('show-videos-btn');
     const photosContent = document.getElementById('photos-content');
     const videosContent = document.getElementById('videos-content');
 
-    // Show photos by default (CSS already handles this, but JS can reinforce)
-    photosContent.style.display = 'block';
-    videosContent.style.display = 'none';
-    photosBtn.classList.add('active');
-    videosBtn.classList.remove('active');
+    if (photosBtn && videosBtn && photosContent && videosContent) { // Check all exist
+        photosContent.style.display = 'block';
+        videosContent.style.display = 'none';
+        photosBtn.classList.add('active');
+        videosBtn.classList.remove('active');
 
-    photosBtn.addEventListener('click', function() {
-      photosContent.style.display = 'block';
-      videosContent.style.display = 'none';
-      photosBtn.classList.add('active');
-      videosBtn.classList.remove('active');
+        photosBtn.addEventListener('click', function() {
+            photosContent.style.display = 'block';
+            videosContent.style.display = 'none';
+            photosBtn.classList.add('active');
+            videosBtn.classList.remove('active');
+        });
+
+        videosBtn.addEventListener('click', function() {
+            photosContent.style.display = 'none';
+            videosContent.style.display = 'block';
+            photosBtn.classList.remove('active');
+            videosBtn.classList.add('active');
+        });
+    }
+
+    // --- Lightbox Functionality ---
+    const lightboxOverlay = document.getElementById('lightbox-overlay');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const lightboxCloseBtn = document.querySelector('.lightbox-close-btn');
+    const photoGallery = document.querySelector('#photos-content .gallery');
+
+    function openLightbox(imgSrc) {
+        if (lightboxImage && lightboxOverlay) {
+            lightboxImage.setAttribute('src', imgSrc);
+            lightboxOverlay.classList.add('lightbox-visible');
+            // lightboxOverlay.classList.remove('lightbox-hidden'); // CSS handles visibility via opacity
+        }
+    }
+
+    function closeLightbox() {
+        if (lightboxOverlay) {
+            lightboxOverlay.classList.remove('lightbox-visible');
+            // lightboxOverlay.classList.add('lightbox-hidden'); // CSS handles visibility via opacity
+            // Optional: Clear the image src to prevent loading an old image next time
+            // lightboxImage.setAttribute('src', ''); 
+        }
+    }
+
+    if (photoGallery) {
+        photoGallery.addEventListener('click', function(event) {
+            if (event.target.tagName === 'IMG') {
+                openLightbox(event.target.getAttribute('src'));
+            }
+        });
+    }
+
+    if (lightboxCloseBtn) {
+        lightboxCloseBtn.addEventListener('click', closeLightbox);
+    }
+    
+    if (lightboxOverlay) {
+        lightboxOverlay.addEventListener('click', function(event) {
+            if (event.target === lightboxOverlay) { 
+                closeLightbox();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
+            closeLightbox();
+        }
     });
 
-    videosBtn.addEventListener('click', function() {
-      photosContent.style.display = 'none';
-      videosContent.style.display = 'block';
-      photosBtn.classList.remove('active');
-      videosBtn.classList.add('active');
-    });
   });
 </script>
