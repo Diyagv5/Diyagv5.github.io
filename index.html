@@ -1,6 +1,6 @@
 ---
 layout: page # Use the theme's default page layout
-title: DnA Photography # Or your preferred site title for the browser tab
+title:  # Or your preferred site title for the browser tab
 # subtitle: "My Portfolio" # Optional subtitle if your theme uses it
 ---
 
@@ -46,6 +46,84 @@ title: DnA Photography # Or your preferred site title for the browser tab
   cursor: pointer;
   line-height: 1;
 }  
+/* ... (your existing lightbox styles for #lightbox-overlay, #lightbox-image) ... */
+
+/* General style for all lightbox buttons for consistency */
+.lightbox-btn {
+  position: absolute;
+  color: white;
+  cursor: pointer;
+  z-index: 1005; /* Above the image container but below other UI if needed */
+  user-select: none; /* Prevent text selection on click */
+}
+
+.lightbox-close-btn { /* Already styled, ensure it has position:absolute */
+  top: 15px;
+  right: 25px;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.lightbox-nav-btn {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 50px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 5px;
+}
+.lightbox-prev-btn {
+  left: 15px;
+}
+.lightbox-next-btn {
+  right: 15px;
+}
+
+/* Container for the image to handle zoom transforms */
+#lightbox-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Important for when image is zoomed larger than container */
+}
+
+#lightbox-image { /* Existing styles, ensure max-width/max-height */
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border: 3px solid white;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease-out; /* For smooth zoom */
+  cursor: grab; /* Indicate it can be panned when zoomed */
+}
+
+#lightbox-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0,0,0,0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  gap: 10px;
+}
+
+.lightbox-zoom-btn {
+  background-color: #444;
+  color: white;
+  border: 1px solid #666;
+  padding: 5px 10px;
+  font-size: 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative; /* Keep it relative to its parent controls div */
+}
+.lightbox-zoom-btn:hover {
+  background-color: #555;
+}
 main.container-md > .row > .col-xl-8.offset-xl-2.col-lg-10.offset-lg-1, /* More specific selector */
 main.container-md > .row > div[class*="col-"] { /* Broader selector if the classes change slightly */
   max-width: none !important;
@@ -207,9 +285,19 @@ main.container-md {
   </div>
 </div>
 
+<!-- Lightbox Structure -->
 <div id="lightbox-overlay" class="lightbox-hidden">
-  <span class="lightbox-close-btn">×</span>
-  <img id="lightbox-image" src="" alt="Enlarged photo">
+  <span id="lightbox-close" class="lightbox-btn lightbox-close-btn">×</span>
+  <span id="lightbox-prev" class="lightbox-btn lightbox-nav-btn lightbox-prev-btn"><</span>
+  <span id="lightbox-next" class="lightbox-btn lightbox-nav-btn lightbox-next-btn">></span>
+  <div id="lightbox-image-container">
+    <img id="lightbox-image" src="" alt="Enlarged photo">
+  </div>
+  <div id="lightbox-controls">
+    <button id="lightbox-zoom-in" class="lightbox-btn lightbox-zoom-btn">+</button>
+    <button id="lightbox-zoom-out" class="lightbox-btn lightbox-zoom-btn">-</button>
+    <button id="lightbox-zoom-reset" class="lightbox-btn lightbox-zoom-btn">Reset</button>
+  </div>
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -240,54 +328,214 @@ main.container-md {
         });
     }
 
-    // --- Lightbox Functionality ---
-    const lightboxOverlay = document.getElementById('lightbox-overlay');
-    const lightboxImage = document.getElementById('lightbox-image');
-    const lightboxCloseBtn = document.querySelector('.lightbox-close-btn');
-    const photoGallery = document.querySelector('#photos-content .gallery');
+   // --- Lightbox Functionality (Enhanced) ---
+const lightboxOverlay = document.getElementById('lightbox-overlay');
+const lightboxImageContainer = document.getElementById('lightbox-image-container'); // New
+const lightboxImage = document.getElementById('lightbox-image');
+const lightboxCloseBtn = document.getElementById('lightbox-close'); // Changed ID
+const lightboxPrevBtn = document.getElementById('lightbox-prev');   // New
+const lightboxNextBtn = document.getElementById('lightbox-next');   // New
+const photoGallery = document.querySelector('#photos-content .gallery');
 
-    function openLightbox(imgSrc) {
-        if (lightboxImage && lightboxOverlay) {
-            lightboxImage.setAttribute('src', imgSrc);
-            lightboxOverlay.classList.add('lightbox-visible');
-            // lightboxOverlay.classList.remove('lightbox-hidden'); // CSS handles visibility via opacity
-        }
-    }
+// Zoom controls
+const zoomInBtn = document.getElementById('lightbox-zoom-in');
+const zoomOutBtn = document.getElementById('lightbox-zoom-out');
+const zoomResetBtn = document.getElementById('lightbox-zoom-reset');
 
-    function closeLightbox() {
-        if (lightboxOverlay) {
-            lightboxOverlay.classList.remove('lightbox-visible');
-            // lightboxOverlay.classList.add('lightbox-hidden'); // CSS handles visibility via opacity
-            // Optional: Clear the image src to prevent loading an old image next time
-            // lightboxImage.setAttribute('src', ''); 
-        }
-    }
+let galleryImageSources = [];
+let currentImageIndex = -1;
+let currentZoomLevel = 1;
+const zoomStep = 0.2;
+const maxZoom = 3;
+const minZoom = 0.4;
 
+// --- Panning when zoomed ---
+let isPanning = false;
+let startPanX, startPanY;
+let startImgX, startImgY;
+
+
+function populateGalleryImageSources() {
+    galleryImageSources = []; // Reset
     if (photoGallery) {
-        photoGallery.addEventListener('click', function(event) {
-            if (event.target.tagName === 'IMG') {
-                openLightbox(event.target.getAttribute('src'));
-            }
-        });
+        const images = photoGallery.querySelectorAll('img');
+        images.forEach(img => galleryImageSources.push(img.getAttribute('src')));
+    }
+}
+
+function updateLightboxImage() {
+    if (currentImageIndex >= 0 && currentImageIndex < galleryImageSources.length) {
+        lightboxImage.setAttribute('src', galleryImageSources[currentImageIndex]);
+        resetZoomAndPan(); // Reset zoom/pan when image changes
+    }
+    // Show/hide nav buttons
+    if (lightboxPrevBtn) lightboxPrevBtn.style.display = (currentImageIndex > 0) ? 'block' : 'none';
+    if (lightboxNextBtn) lightboxNextBtn.style.display = (currentImageIndex < galleryImageSources.length - 1) ? 'block' : 'none';
+}
+
+function openLightbox(clickedImgSrc) {
+    populateGalleryImageSources(); // Get fresh list of images every time
+    currentImageIndex = galleryImageSources.indexOf(clickedImgSrc);
+
+    if (currentImageIndex === -1) { // Should not happen if click is on gallery img
+        console.error("Clicked image source not found in gallery list.");
+        return;
     }
 
-    if (lightboxCloseBtn) {
-        lightboxCloseBtn.addEventListener('click', closeLightbox);
-    }
-    
     if (lightboxOverlay) {
-        lightboxOverlay.addEventListener('click', function(event) {
-            if (event.target === lightboxOverlay) { 
-                closeLightbox();
-            }
-        });
+        updateLightboxImage();
+        lightboxOverlay.classList.add('lightbox-visible');
     }
+}
 
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
+function closeLightbox() {
+    if (lightboxOverlay) {
+        lightboxOverlay.classList.remove('lightbox-visible');
+        resetZoomAndPan();
+    }
+}
+
+function showPrevImage() {
+    if (currentImageIndex > 0) {
+        currentImageIndex--;
+        updateLightboxImage();
+    }
+}
+
+function showNextImage() {
+    if (currentImageIndex < galleryImageSources.length - 1) {
+        currentImageIndex++;
+        updateLightboxImage();
+    }
+}
+
+function applyZoom() {
+    if (lightboxImage) {
+        lightboxImage.style.transform = `scale(${currentZoomLevel}) translate(${startImgX || 0}px, ${startImgY || 0}px)`;
+    }
+}
+
+function resetZoomAndPan() {
+    currentZoomLevel = 1;
+    startImgX = 0;
+    startImgY = 0;
+    applyZoom();
+    lightboxImage.style.cursor = 'grab';
+}
+
+// --- Event Listeners ---
+if (photoGallery) {
+    photoGallery.addEventListener('click', function(event) {
+        if (event.target.tagName === 'IMG') {
+            event.preventDefault(); // Good practice
+            openLightbox(event.target.getAttribute('src'));
+        }
+    });
+}
+
+if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', showPrevImage);
+if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', showNextImage);
+
+if (lightboxOverlay) {
+    lightboxOverlay.addEventListener('click', function(event) {
+        if (event.target === lightboxOverlay) { // Click on overlay itself
             closeLightbox();
         }
     });
+}
 
-  });
+// Keyboard navigation
+document.addEventListener('keydown', function(event) {
+    if (lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
+        if (event.key === 'Escape') closeLightbox();
+        if (event.key === 'ArrowLeft') showPrevImage();
+        if (event.key === 'ArrowRight') showNextImage();
+        // Could add + and - for zoom here too
+    }
+});
+
+// Zoom button listeners
+if (zoomInBtn) {
+    zoomInBtn.addEventListener('click', function() {
+        if (currentZoomLevel < maxZoom) {
+            currentZoomLevel += zoomStep;
+            applyZoom();
+        }
+    });
+}
+if (zoomOutBtn) {
+    zoomOutBtn.addEventListener('click', function() {
+        if (currentZoomLevel > minZoom) {
+            currentZoomLevel -= zoomStep;
+            if (currentZoomLevel < minZoom) currentZoomLevel = minZoom; // Ensure min
+            applyZoom();
+        }
+    });
+}
+if (zoomResetBtn) {
+    zoomResetBtn.addEventListener('click', resetZoomAndPan);
+}
+
+// Mouse wheel zoom (optional, can be a bit finicky)
+if (lightboxImageContainer) {
+    lightboxImageContainer.addEventListener('wheel', function(event) {
+        if (lightboxOverlay.classList.contains('lightbox-visible')) {
+            event.preventDefault(); // Prevent page scroll
+            if (event.deltaY < 0) { // Scroll up = zoom in
+                if (currentZoomLevel < maxZoom) currentZoomLevel += zoomStep;
+            } else { // Scroll down = zoom out
+                if (currentZoomLevel > minZoom) currentZoomLevel -= zoomStep;
+                if (currentZoomLevel < minZoom) currentZoomLevel = minZoom;
+            }
+            applyZoom();
+        }
+    }, { passive: false }); // passive: false to allow preventDefault
+}
+
+// --- Panning Logic ---
+if (lightboxImage) {
+    lightboxImage.addEventListener('mousedown', function(e) {
+        if (currentZoomLevel > 1) { // Only allow panning if zoomed in
+            e.preventDefault();
+            isPanning = true;
+            startPanX = e.clientX;
+            startPanY = e.clientY;
+            // Get current translation if any
+            const currentTransform = getComputedStyle(lightboxImage).transform;
+            if (currentTransform !== 'none') {
+                const matrix = new DOMMatrix(currentTransform);
+                startImgX = matrix.m41 / currentZoomLevel; // Correct for current scale
+                startImgY = matrix.m42 / currentZoomLevel;
+            } else {
+                startImgX = 0;
+                startImgY = 0;
+            }
+            lightboxImage.style.cursor = 'grabbing';
+        }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isPanning) {
+            e.preventDefault();
+            const dx = (e.clientX - startPanX) / currentZoomLevel; // Adjust sensitivity by zoom
+            const dy = (e.clientY - startPanY) / currentZoomLevel;
+            lightboxImage.style.transform = `scale(${currentZoomLevel}) translate(${startImgX + dx}px, ${startImgY + dy}px)`;
+        }
+    });
+
+    document.addEventListener('mouseup', function(e) {
+        if (isPanning) {
+            isPanning = false;
+            // Update startImgX/Y for next pan to be relative to current position
+            const dx = (e.clientX - startPanX) / currentZoomLevel;
+            const dy = (e.clientY - startPanY) / currentZoomLevel;
+            startImgX += dx;
+            startImgY += dy;
+            lightboxImage.style.cursor = 'grab';
+        }
+    });
+     // Prevent dragging the image itself (browser default behavior)
+    lightboxImage.addEventListener('dragstart', (e) => e.preventDefault());
+}
 </script>
