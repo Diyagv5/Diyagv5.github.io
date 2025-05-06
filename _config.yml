@@ -9,9 +9,9 @@ url: "https://diyagv5.github.io"
 baseurl: ""
 
 # --- List of links in the navigation bar --- #
-navbar-links:
-  Photos: "photos/"  # We will create a page at /photos.md or /photos/index.md
-  Videos: "videos/"  # We will create a page at /videos.md or /videos/index.md
+#navbar-links:
+#  Photos: "photos/"  # We will create a page at /photos.md or /photos/index.md
+#  Videos: "videos/"  # We will create a page at /videos.md or /videos/index.md
 # About Me: "aboutme/" # You can add an about page later if you wish
 
 # Image to show in the navigation bar - works best with a square image
