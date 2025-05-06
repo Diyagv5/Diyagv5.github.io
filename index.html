@@ -6,6 +6,26 @@ title: DnA Photography # Or your preferred site title for the browser tab
 
 <style>
   /* Basic styles for the new layout - we can move this to custom.css later */
+  /* Target the theme's column container to make it full width */
+main.container-md > .row > .col-xl-8.offset-xl-2.col-lg-10.offset-lg-1, /* More specific selector */
+main.container-md > .row > div[class*="col-"] { /* Broader selector if the classes change slightly */
+  max-width: none !important;
+  width: 100% !important;
+  flex-basis: 100% !important; /* If it's a flex item */
+  margin-left: 0 !important;   /* Remove offsets */
+  margin-right: 0 !important;
+  /* Keep some padding for the content inside so it's not flush with screen edges */
+  /* The padding on .content-section might be enough, or you can add it here too */
+  /* padding-left: 15px; */
+  /* padding-right: 15px; */
+  /* box-sizing: border-box; */
+}
+
+/* Also ensure the .row and .container-md allow full width if they are also constraining */
+main.container-md > .row,
+main.container-md {
+    max-width: none !important;
+}
   .cover-section {
     height: 70vh; /* Adjust height as needed */
     background-size: cover;
