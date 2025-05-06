@@ -1,12 +1,11 @@
 ---
 layout: page
-title: DnA  # Or your preferred site title
+title: hehhehe # Or your preferred site title
 # subtitle: "My Portfolio"
 ---
 
 <style>
   /* --- Main Page & Theme Overrides --- */
-  /* Target the theme's column container to make it full width */
   main.container-md > .row > .col-xl-8.offset-xl-2.col-lg-10.offset-lg-1,
   main.container-md > .row > div[class*="col-"] {
     max-width: none !important;
@@ -15,11 +14,9 @@ title: DnA  # Or your preferred site title
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-
-  /* Also ensure the .row and .container-md allow full width */
   main.container-md > .row,
   main.container-md {
-      max-width: none !important;
+    max-width: none !important;
   }
 
   /* --- Cover Section --- */
@@ -39,7 +36,7 @@ title: DnA  # Or your preferred site title
     text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
   }
 
-  /* --- Content Switcher (Photos/Videos Buttons) --- */
+  /* --- Content Switcher --- */
   .content-switcher {
     text-align: center;
     padding: 20px 0;
@@ -57,7 +54,7 @@ title: DnA  # Or your preferred site title
     border-color: #333;
   }
 
-  /* --- Content Sections (Photos/Videos Wrappers) --- */
+  /* --- Content Sections --- */
   .content-section {
     padding: 20px;
     box-sizing: border-box;
@@ -67,27 +64,17 @@ title: DnA  # Or your preferred site title
     max-width: none;
     width: 100%;
   }
-  #photos-content {
-    /* display: block; /* JS handles initial display */
-  }
-  #videos-content {
-    display: none; /* Initially hidden */
-  }
+  #photos-content {} /* JS handles display */
+  #videos-content { display: none; }
 
   /* --- Gallery Styles (Responsive Columns) --- */
   .gallery { /* Default for mobile */
     column-count: 2;
     column-gap: 10px;
   }
-  @media (min-width: 768px) { /* Medium screens */
-    .gallery { column-count: 3; }
-  }
-  @media (min-width: 992px) { /* Large screens */
-    .gallery { column-count: 4; }
-  }
-  @media (min-width: 1200px) { /* Extra large screens */
-    .gallery { column-count: 5; }
-  }
+  @media (min-width: 768px) { .gallery { column-count: 3; } }
+  @media (min-width: 992px) { .gallery { column-count: 4; } }
+  @media (min-width: 1200px) { .gallery { column-count: 5; } }
 
   .gallery img {
     width: 100%;
@@ -97,7 +84,7 @@ title: DnA  # Or your preferred site title
     border: 1px solid #ddd;
     border-radius: 4px;
     transition: transform 0.3s ease-in-out;
-    cursor: pointer; /* Indicate images are clickable for lightbox */
+    cursor: pointer; 
   }
   .gallery img:hover {
     transform: scale(1.05);
@@ -106,7 +93,7 @@ title: DnA  # Or your preferred site title
     position: relative;
   }
 
-  /* --- Lightbox Styles - CONSOLIDATED --- */
+  /* --- Simple Lightbox Styles --- */
   #lightbox-overlay {
     position: fixed;
     top: 0;
@@ -120,21 +107,12 @@ title: DnA  # Or your preferred site title
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s 0.3s; /* Delay visibility transition */
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
   }
   #lightbox-overlay.lightbox-visible {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.3s ease, visibility 0s 0s;
-  }
-
-  #lightbox-image-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
   }
   #lightbox-image {
     max-width: 90%;
@@ -142,64 +120,25 @@ title: DnA  # Or your preferred site title
     object-fit: contain;
     border: 3px solid white;
     box-shadow: 0 0 25px rgba(0,0,0,0.5);
-    transition: transform 0.2s ease-out;
-    cursor: grab;
   }
-
-  .lightbox-btn { /* General style for all lightbox buttons */
+  .lightbox-close-btn { /* This class is for the <span> */
     position: absolute;
-    color: white;
-    cursor: pointer;
-    z-index: 1005;
-    user-select: none;
-  }
-  .lightbox-close-btn {
     top: 15px;
     right: 25px;
     font-size: 40px;
-    line-height: 1;
-  }
-  .lightbox-nav-btn {
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 50px;
-    padding: 10px;
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 5px;
-  }
-  .lightbox-prev-btn { left: 15px; }
-  .lightbox-next-btn { right: 15px; }
-
-  #lightbox-controls {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0,0,0,0.5);
-    padding: 5px 10px;
-    border-radius: 5px;
-    display: flex;
-    gap: 10px;
-  }
-  .lightbox-zoom-btn {
-    background-color: #444;
     color: white;
-    border: 1px solid #666;
-    padding: 5px 10px;
-    font-size: 16px;
-    border-radius: 3px;
     cursor: pointer;
-    position: relative; /* Stay in flow of controls div */
+    line-height: 1;
+    user-select: none;
   }
-  .lightbox-zoom-btn:hover { background-color: #555; }
 
-  .video-placeholder { /* Placeholder for videos, if you use it */
+  .video-placeholder {
     background-color: #ddd;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%; /* To match gallery img width */
-    height: 150px; /* Or adjust as needed */
+    width: 100%;
+    height: 150px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -236,23 +175,14 @@ title: DnA  # Or your preferred site title
 <div id="videos-content" class="content-section">
   <h2>Videos</h2>
   <div class="gallery">
-    <p><em>aayinilla</em></p>
+    <p><em>Your videos will appear here.</em></p>
   </div>
 </div>
 
-<!-- Lightbox Structure (Updated for Nav/Zoom) -->
+<!-- Simple Lightbox Structure -->
 <div id="lightbox-overlay" class="lightbox-hidden">
-  <span id="lightbox-close" class="lightbox-btn lightbox-close-btn">×</span>
-  <span id="lightbox-prev" class="lightbox-btn lightbox-nav-btn lightbox-prev-btn"><</span>
-  <span id="lightbox-next" class="lightbox-btn lightbox-nav-btn lightbox-next-btn">></span>
-  <div id="lightbox-image-container">
-    <img id="lightbox-image" src="" alt="Enlarged photo">
-  </div>
-  <div id="lightbox-controls">
-    <button id="lightbox-zoom-in" class="lightbox-btn lightbox-zoom-btn">+</button>
-    <button id="lightbox-zoom-out" class="lightbox-btn lightbox-zoom-btn">-</button>
-    <button id="lightbox-zoom-reset" class="lightbox-btn lightbox-zoom-btn">Reset</button>
-  </div>
+  <span id="lightbox-close" class="lightbox-close-btn">×</span> {/* Changed class to id for JS targeting */}
+  <img id="lightbox-image" src="" alt="Enlarged photo">
 </div>
 
 <script>
@@ -283,55 +213,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Lightbox Functionality (Enhanced) ---
+    // --- Simple Lightbox Functionality ---
     const lightboxOverlay = document.getElementById('lightbox-overlay');
-    const lightboxImageContainer = document.getElementById('lightbox-image-container');
     const lightboxImage = document.getElementById('lightbox-image');
-    const lightboxCloseBtn = document.getElementById('lightbox-close');
-    const lightboxPrevBtn = document.getElementById('lightbox-prev');
-    const lightboxNextBtn = document.getElementById('lightbox-next');
+    const lightboxCloseBtn = document.getElementById('lightbox-close'); // Targeting by ID now
     const photoGallery = document.querySelector('#photos-content .gallery');
 
-    const zoomInBtn = document.getElementById('lightbox-zoom-in');
-    const zoomOutBtn = document.getElementById('lightbox-zoom-out');
-    const zoomResetBtn = document.getElementById('lightbox-zoom-reset');
-
-    let galleryImageSources = [];
-    let currentImageIndex = -1;
-    let currentZoomLevel = 1;
-    const zoomStep = 0.2;
-    const maxZoom = 3;
-    const minZoom = 0.4;
-
-    let isPanning = false;
-    let panStartX = 0, panStartY = 0; // Renamed from startPanX to avoid conflict if photosBtn was startPanX
-    let imageInitialX = 0, imageInitialY = 0; // Renamed from startImgX
-
-
-    function populateGalleryImageSources() {
-        galleryImageSources = [];
-        if (photoGallery) {
-            const images = photoGallery.querySelectorAll('img');
-            images.forEach(img => galleryImageSources.push(img.getAttribute('src')));
-        }
-    }
-
-    function updateLightboxImage() {
-        if (lightboxImage && currentImageIndex >= 0 && currentImageIndex < galleryImageSources.length) {
-            lightboxImage.setAttribute('src', galleryImageSources[currentImageIndex]);
-            resetZoomAndPan();
-        }
-        if (lightboxPrevBtn) lightboxPrevBtn.style.display = (galleryImageSources.length > 1 && currentImageIndex > 0) ? 'block' : 'none';
-        if (lightboxNextBtn) lightboxNextBtn.style.display = (galleryImageSources.length > 1 && currentImageIndex < galleryImageSources.length - 1) ? 'block' : 'none';
-    }
-
-    function openLightbox(clickedImgSrc) {
-        populateGalleryImageSources();
-        currentImageIndex = galleryImageSources.indexOf(clickedImgSrc);
-        if (currentImageIndex === -1) return;
-
-        if (lightboxOverlay) {
-            updateLightboxImage();
+    function openLightbox(imgSrc) {
+        if (lightboxImage && lightboxOverlay) {
+            lightboxImage.setAttribute('src', imgSrc);
             lightboxOverlay.classList.add('lightbox-visible');
         }
     }
@@ -339,132 +229,36 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeLightbox() {
         if (lightboxOverlay) {
             lightboxOverlay.classList.remove('lightbox-visible');
-            resetZoomAndPan();
         }
-    }
-
-    function showPrevImage() {
-        if (currentImageIndex > 0) {
-            currentImageIndex--;
-            updateLightboxImage();
-        }
-    }
-    function showNextImage() {
-        if (currentImageIndex < galleryImageSources.length - 1) {
-            currentImageIndex++;
-            updateLightboxImage();
-        }
-    }
-
-    function applyZoom() {
-        if (lightboxImage) {
-            // Ensure imageInitialX/Y are numbers, default to 0 if not
-            const translateX = typeof imageInitialX === 'number' ? imageInitialX : 0;
-            const translateY = typeof imageInitialY === 'number' ? imageInitialY : 0;
-            lightboxImage.style.transform = `scale(${currentZoomLevel}) translate(${translateX}px, ${translateY}px)`;
-        }
-    }
-    function resetZoomAndPan() {
-        currentZoomLevel = 1;
-        imageInitialX = 0;
-        imageInitialY = 0;
-        applyZoom();
-        if(lightboxImage) lightboxImage.style.cursor = 'grab';
     }
 
     if (photoGallery) {
         photoGallery.addEventListener('click', function(event) {
             if (event.target.tagName === 'IMG') {
-                event.preventDefault();
+                event.preventDefault(); // Good practice
                 openLightbox(event.target.getAttribute('src'));
             }
         });
     }
 
-    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
-    if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', showPrevImage);
-    if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', showNextImage);
-
-    if (lightboxOverlay) {
+    if (lightboxCloseBtn) { // Check if the element exists
+        lightboxCloseBtn.addEventListener('click', closeLightbox);
+    }
+    
+    if (lightboxOverlay) { // Check if the element exists
         lightboxOverlay.addEventListener('click', function(event) {
-            if (event.target === lightboxOverlay) closeLightbox();
+            // Only close if the click is on the overlay itself, not the image
+            if (event.target === lightboxOverlay) { 
+                closeLightbox();
+            }
         });
     }
+
+    // Keyboard navigation: Close lightbox with Escape key
     document.addEventListener('keydown', function(event) {
-        if (lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
-            if (event.key === 'Escape') closeLightbox();
-            if (event.key === 'ArrowLeft') showPrevImage();
-            if (event.key === 'ArrowRight') showNextImage();
+        if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
+            closeLightbox();
         }
     });
-
-    if (zoomInBtn) zoomInBtn.addEventListener('click', function() {
-        if (currentZoomLevel < maxZoom) { currentZoomLevel = parseFloat((currentZoomLevel + zoomStep).toFixed(2)); applyZoom(); }
-    });
-    if (zoomOutBtn) zoomOutBtn.addEventListener('click', function() {
-        if (currentZoomLevel > minZoom) { currentZoomLevel = parseFloat((currentZoomLevel - zoomStep).toFixed(2)); if (currentZoomLevel < minZoom) currentZoomLevel = minZoom; applyZoom(); }
-    });
-    if (zoomResetBtn) zoomResetBtn.addEventListener('click', resetZoomAndPan);
-
-    if (lightboxImageContainer) {
-        lightboxImageContainer.addEventListener('wheel', function(event) {
-            if (lightboxOverlay.classList.contains('lightbox-visible')) {
-                event.preventDefault();
-                let newZoomLevel = currentZoomLevel;
-                if (event.deltaY < 0) { // Scroll up = zoom in
-                    if (newZoomLevel < maxZoom) newZoomLevel += zoomStep;
-                } else { // Scroll down = zoom out
-                    if (newZoomLevel > minZoom) newZoomLevel -= zoomStep;
-                }
-                newZoomLevel = parseFloat(newZoomLevel.toFixed(2));
-                if (newZoomLevel < minZoom) newZoomLevel = minZoom;
-                if (newZoomLevel > maxZoom) newZoomLevel = maxZoom;
-                
-                // Zoom towards mouse pointer (more advanced, optional)
-                // For simplicity, this version zooms towards center.
-                // To zoom towards pointer, you'd need to calculate translation adjustments based on pointer position.
-
-                currentZoomLevel = newZoomLevel;
-                applyZoom();
-            }
-        }, { passive: false });
-    }
-
-    if (lightboxImage) {
-        lightboxImage.addEventListener('mousedown', function(e) {
-            if (currentZoomLevel > 1) {
-                e.preventDefault();
-                isPanning = true;
-                panStartX = e.clientX;
-                panStartY = e.clientY;
-                // Use current imageInitialX/Y as starting point for this drag
-                lightboxImage.style.cursor = 'grabbing';
-            }
-        });
-        document.addEventListener('mousemove', function(e) {
-            if (isPanning) {
-                e.preventDefault();
-                const dx = (e.clientX - panStartX) / currentZoomLevel; // Pan relative to screen pixels, adjusted by zoom
-                const dy = (e.clientY - panStartY) / currentZoomLevel;
-                // Ensure imageInitialX/Y are numbers
-                const currentTranslateX = typeof imageInitialX === 'number' ? imageInitialX : 0;
-                const currentTranslateY = typeof imageInitialY === 'number' ? imageInitialY : 0;
-
-                lightboxImage.style.transform = `scale(${currentZoomLevel}) translate(${currentTranslateX + dx}px, ${currentTranslateY + dy}px)`;
-            }
-        });
-        document.addEventListener('mouseup', function(e) {
-            if (isPanning) {
-                isPanning = false;
-                // Update imageInitialX/Y to be the new resting position of the translation
-                const dx = (e.clientX - panStartX) / currentZoomLevel;
-                const dy = (e.clientY - panStartY) / currentZoomLevel;
-                imageInitialX = (typeof imageInitialX === 'number' ? imageInitialX : 0) + dx;
-                imageInitialY = (typeof imageInitialY === 'number' ? imageInitialY : 0) + dy;
-                lightboxImage.style.cursor = 'grab';
-            }
-        });
-        lightboxImage.addEventListener('dragstart', (e) => e.preventDefault());
-    }
 });
 </script>
