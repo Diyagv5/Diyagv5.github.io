@@ -40,7 +40,14 @@ title: DnA Photography # Or your preferred site title for the browser tab
   }
   .content-section {
     padding: 20px;
-    /* display: none; initially hide all content sections except the default one */
+     box-sizing: border-box; /* Good practice for layout with padding/borders */
+}
+
+/* Make the specific photo and video sections attempt to be full width */
+#photos-content,
+#videos-content {
+  max-width: none; /* Override any theme constraint on these specific IDs */
+  width: 100%; /* display: none; initially hide all content sections except the default one */
   }
   #photos-content {
     /* display: block; photos are visible by default */
