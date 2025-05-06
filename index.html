@@ -82,14 +82,20 @@ title: DnA Photography # Or your preferred site title for the browser tab
 
 <div id="photos-content" class="content-section">
   <h2>Photos</h2>
-  <div class="gallery">
-    <!-- Add your photo image tags here -->
-    <!-- Example: -->
-    <!-- <img src="/assets/img/photo1.jpg" alt="Description of photo 1"> -->
-    <!-- <img src="/assets/img/photo2.jpg" alt="Description of photo 2"> -->
-    <!-- <img src="/assets/img/photo3.jpg" alt="Description of photo 3"> -->
-    <p><em>Your photos will appear here. You'll need to upload them to <code>/assets/img/</code> and add <code><img></code> tags.</em></p>
-  </div>
+     <div class="gallery">
+      {% assign image_files = site.static_files | where_exp: "item", "item.path contains '/assets/img/'" %}
+      {% assign image_files_sorted = image_files | sort: "name" %}
+
+      {% for image in image_files_sorted %}
+        {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
+          <img src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
+        {% endif %}
+      {% endfor %}
+
+      {% if image_files.size == 0 %}
+        <p><em>No photos found. Ensure photos are uploaded to the <code>/assets/img/</code> folder.</em></p>
+      {% endif %}
+    </div>
 </div>
 
 <div id="videos-content" class="content-section">
