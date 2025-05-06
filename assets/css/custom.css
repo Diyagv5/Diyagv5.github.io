@@ -1,0 +1,22 @@
+/* Custom CSS to center navbar links in Beautiful Jekyll */
+
+.navbar-custom .navbar-nav {
+    float: none; /* Override the default float */
+    margin: 0 auto; /* Center the block */
+    display: table; /* Helps with centering inline-block elements */
+    table-layout: fixed; /* Distribute space evenly if needed */
+}
+
+/* Optional: If the above doesn't perfectly center,
+   you might need to adjust for the search icon or brand name.
+   This targets the list itself within the navbar. */
+.navbar-custom .nav.navbar-nav {
+    display: flex;
+    justify-content: center;
+    width: 100%; /* Ensure it takes full available width to center within */
+}
+
+/* Ensure individual links are not floated if they were */
+.navbar-custom .navbar-nav > li {
+    float: none;
+}
