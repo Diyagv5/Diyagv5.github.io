@@ -1,10 +1,133 @@
 ---
-layout: page
-
-# subtitle: My Photography and Videography Portfolio
+layout: page # Use the theme's default page layout
+title: DnA Photography # Or your preferred site title for the browser tab
+# subtitle: "My Portfolio" # Optional subtitle if your theme uses it
 ---
 
-<div>
-  <!-- Homepage content can go here if desired,
-       but primary content will be on Photos/Videos pages. -->
+<style>
+  /* Basic styles for the new layout - we can move this to custom.css later */
+  .cover-section {
+    height: 70vh; /* Adjust height as needed */
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white; /* Assuming dark cover photo */
+    /* Add your cover image URL here */
+    background-image: url('/assets/img/your-cover-image.jpg'); /* <-- IMPORTANT: REPLACE THIS PATH */
+  }
+  .cover-section h1 {
+    font-size: 3em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  }
+  .content-switcher {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .content-switcher button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+  }
+  .content-switcher button.active {
+    background-color: #333;
+    color: white;
+    border-color: #333;
+  }
+  .content-section {
+    padding: 20px;
+    /* display: none; initially hide all content sections except the default one */
+  }
+  #photos-content {
+    /* display: block; photos are visible by default */
+  }
+  #videos-content {
+    display: none; /* videos are hidden by default */
+  }
+
+  /* Basic gallery styles (you'll want to improve this) */
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Space between items */
+    justify-content: center;
+  }
+  .gallery img, .gallery .video-placeholder {
+    width: 200px; /* Adjust as needed */
+    height: 150px; /* Adjust as needed */
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+  .video-placeholder { /* For video placeholders */
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<div class="cover-section">
+  <!-- You can put a title on your cover image if you want -->
+  <!-- <h1>DnA Photography</h1> -->
 </div>
+
+<div class="content-switcher">
+  <button id="show-photos-btn" class="active">Photos</button>
+  <button id="show-videos-btn">Videos</button>
+</div>
+
+<div id="photos-content" class="content-section">
+  <h2>Photos</h2>
+  <div class="gallery">
+    <!-- Add your photo image tags here -->
+    <!-- Example: -->
+    <!-- <img src="/assets/img/photo1.jpg" alt="Description of photo 1"> -->
+    <!-- <img src="/assets/img/photo2.jpg" alt="Description of photo 2"> -->
+    <!-- <img src="/assets/img/photo3.jpg" alt="Description of photo 3"> -->
+    <p><em>Your photos will appear here. You'll need to upload them to <code>/assets/img/</code> and add <code><img></code> tags.</em></p>
+  </div>
+</div>
+
+<div id="videos-content" class="content-section">
+  <h2>Videos</h2>
+  <div class="gallery"> <!-- Re-using gallery class for videos for now -->
+    <!-- Add your video embeds or links here -->
+    <!-- Example (placeholder): -->
+    <!-- <div class="video-placeholder">Video 1</div> -->
+    <!-- <div class="video-placeholder">Video 2</div> -->
+    <p><em>Your videos will appear here. You'll need to decide how to embed them (e.g., YouTube, Vimeo, or direct HTML5 video tags after uploading to <code>/assets/videos/</code>).</em></p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const photosBtn = document.getElementById('show-photos-btn');
+    const videosBtn = document.getElementById('show-videos-btn');
+    const photosContent = document.getElementById('photos-content');
+    const videosContent = document.getElementById('videos-content');
+
+    // Show photos by default (CSS already handles this, but JS can reinforce)
+    photosContent.style.display = 'block';
+    videosContent.style.display = 'none';
+    photosBtn.classList.add('active');
+    videosBtn.classList.remove('active');
+
+    photosBtn.addEventListener('click', function() {
+      photosContent.style.display = 'block';
+      videosContent.style.display = 'none';
+      photosBtn.classList.add('active');
+      videosBtn.classList.remove('active');
+    });
+
+    videosBtn.addEventListener('click', function() {
+      photosContent.style.display = 'none';
+      videosContent.style.display = 'block';
+      photosBtn.classList.remove('active');
+      videosBtn.classList.add('active');
+    });
+  });
+</script>
