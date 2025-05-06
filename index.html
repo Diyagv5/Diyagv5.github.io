@@ -1,45 +1,83 @@
-
----
-layout: page
-title: heheheee # Or your preferred site title
-# subtitle: "My Portfolio"
----
-
+layout: page # Use the theme's default page layout
+title:  # Or your preferred site title for the browser tab
+subtitle: "My Portfolio" # Optional subtitle if your theme uses it
 <style>
-  /* --- Main Page & Theme Overrides --- */
-  main.container-md > .row > .col-xl-8.offset-xl-2.col-lg-10.offset-lg-1,
-  main.container-md > .row > div[class*="col-"] {
-    max-width: none !important;
-    width: 100% !important;
-    flex-basis: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  main.container-md > .row,
-  main.container-md {
-    max-width: none !important;
-  }
+  /* Basic styles for the new layout - we can move this to custom.css later */
+  /* Target the theme's column container to make it full width */
+/* Lightbox Styles */
+#lightbox-overlay {
+  position: fixed; /* Stay in place during scroll */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* Dimmed background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it's on top of everything */
+  opacity: 0; /* Initially transparent */
+  visibility: hidden; /* Initially hidden and not interactive */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
 
-  /* --- Cover Section (Commented out if no image) --- */
-  /*
+#lightbox-overlay.lightbox-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#lightbox-image {
+  max-width: 90%;   /* Image won't exceed 90% of viewport width */
+  max-height: 90%;  /* Image won't exceed 90% of viewport height */
+  object-fit: contain; /* Ensure entire image is visible, no cropping */
+  border: 3px solid white;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+  line-height: 1;
+}  
+main.container-md > .row > .col-xl-8.offset-xl-2.col-lg-10.offset-lg-1, /* More specific selector */
+main.container-md > .row > div[class*="col-"] { /* Broader selector if the classes change slightly */
+  max-width: none !important;
+  width: 100% !important;
+  flex-basis: 100% !important; /* If it's a flex item */
+  margin-left: 0 !important;   /* Remove offsets */
+  margin-right: 0 !important;
+  /* Keep some padding for the content inside so it's not flush with screen edges */
+  /* The padding on .content-section might be enough, or you can add it here too */
+  /* padding-left: 15px; */
+  /* padding-right: 15px; */
+  /* box-sizing: border-box; */
+}
+
+/* Also ensure the .row and .container-md allow full width if they are also constraining */
+main.container-md > .row,
+main.container-md {
+    max-width: none !important;
+}
   .cover-section {
-    height: 70vh; 
+    height: 70vh; /* Adjust height as needed */
     background-size: cover;
     background-position: center center;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white;
-    background-image: url(''); /* No image path specified */
-  /* }
+    color: white; /* Assuming dark cover photo */
+    /* Add your cover image URL here */
+    background-image: url('/assets/img/your-cover-image.jpg'); /* <-- IMPORTANT: REPLACE THIS PATH */
+  }
   .cover-section h1 {
     font-size: 3em;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
   }
-  */
-
-  /* --- Content Switcher --- */
   .content-switcher {
     text-align: center;
     padding: 20px 0;
@@ -56,212 +94,187 @@ title: heheheee # Or your preferred site title
     color: white;
     border-color: #333;
   }
-
-  /* --- Content Sections --- */
   .content-section {
     padding: 20px;
-    box-sizing: border-box;
+     box-sizing: border-box; /* Good practice for layout with padding/borders */
+}
+
+/* Make the specific photo and video sections attempt to be full width */
+#photos-content,
+#videos-content {
+  max-width: none; /* Override any theme constraint on these specific IDs */
+  width: 100%; /* display: none; initially hide all content sections except the default one */
   }
-  #photos-content,
+  #photos-content {
+    /* display: block; photos are visible by default */
+  }
   #videos-content {
-    max-width: none;
-    width: 100%;
-  }
-  #photos-content {} /* JS handles display */
-  #videos-content { display: none; }
-
-  /* --- Gallery Styles (Responsive Columns) --- */
-  .gallery { /* Default for mobile */
-    column-count: 2;
-    column-gap: 10px;
-  }
-  @media (min-width: 768px) { .gallery { column-count: 3; } }
-  @media (min-width: 992px) { .gallery { column-count: 4; } }
-  @media (min-width: 1200px) { .gallery { column-count: 5; } }
-
-  .gallery img {
-    width: 100%;
-    height: auto;
-    display: block;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: transform 0.3s ease-in-out;
-    cursor: pointer; 
-  }
-  .gallery img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 10;
-    position: relative;
+    display: none; /* videos are hidden by default */
   }
 
-  /* --- Simple Lightbox Styles --- */
-  #lightbox-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s 0.3s;
-  }
-  #lightbox-overlay.lightbox-visible {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease, visibility 0s 0s;
-  }
-  #lightbox-image {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-    border: 3px solid white;
-    box-shadow: 0 0 25px rgba(0,0,0,0.5);
-  }
-  .lightbox-close-btn { 
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    font-size: 40px;
-    color: white;
-    cursor: pointer;
-    line-height: 1;
-    user-select: none;
-  }
+  /* Improved Gallery Styles */
+/* Default for mobile (smallest screens first - mobile-first approach) */
+.gallery {
+  column-count: 2; /* e.g., 2 columns on small screens - YOU CAN CHANGE THIS TO 1 IF YOU PREFER */
+  column-gap: 10px;
+  /* padding: 10px; -- The .content-section already has padding, this might be redundant */
+}
 
-  .video-placeholder {
+/* Medium screens (e.g., tablets) */
+@media (min-width: 768px) {
+  .gallery {
+    column-count: 3; /* 3 columns for tablets */
+  }
+}
+
+/* Large screens (e.g., desktops) */
+@media (min-width: 992px) {
+  .gallery {
+    column-count: 4; /* 4 columns for desktops */
+  }
+}
+
+/* Extra large screens (optional) */
+@media (min-width: 1200px) {
+  .gallery {
+    column-count: 5; /* 5 columns for very wide screens */
+  }
+}
+.gallery img {
+  width: 100%; /* Image will fill the width of its column */
+  height: auto;  /* Height will adjust to maintain aspect ratio */
+  display: block; /* Prevents extra space below images */
+  margin-bottom: 10px; /* Space below each image before the next one in the column */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* For the hover effect */
+.gallery img:hover {
+  transform: scale(1.05); /* Make image 105% of its size on hover */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Optional: add a slight shadow */
+  z-index: 10; /* Optional: bring it to the front if overlapping */
+  position: relative; /* Needed for z-index to work properly in some cases */
+}
+  .video-placeholder { /* For video placeholders */
     background-color: #ddd;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 150px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
 </style>
-
-<!-- Cover Section HTML (Commented out if no image/title wanted here) -->
-<!--
 <div class="cover-section">
-  <h1>Your Site Title Here (Optional)</h1>
+  <!-- You can put a title on your cover image if you want -->
+  <!-- <h1>DnA</h1> -->
 </div>
--->
-
 <div class="content-switcher">
   <button id="show-photos-btn" class="active">Photos</button>
   <button id="show-videos-btn">Videos</button>
 </div>
-
 <div id="photos-content" class="content-section">
   <h2>Photos</h2>
-  <div class="gallery">
-    {% assign image_files = site.static_files | where_exp: "item", "item.path contains '/assets/img/'" %}
-    {% assign image_files_sorted = image_files | sort: "name" %}
-    {% for image in image_files_sorted %}
-      {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
-        <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
-      {% endif %}
-    {% endfor %}
-    {% if image_files.size == 0 %}
-      <p><em>No photos found. Ensure photos are uploaded to the <code>/assets/img/</code> folder.</em></p>
+     <div class="gallery">
+      {% assign image_files = site.static_files | where_exp: "item", "item.path contains '/assets/img/'" %}
+      {% assign image_files_sorted = image_files | sort: "name" %}
+{% for image in image_files_sorted %}
+    {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
+      <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
     {% endif %}
-  </div>
-</div>
+  {% endfor %}
 
+  {% if image_files.size == 0 %}
+    <p><em>No photos found. Ensure photos are uploaded to the <code>/assets/img/</code> folder.</em></p>
+  {% endif %}
+</div>
 <div id="videos-content" class="content-section">
   <h2>Videos</h2>
-  <div class="gallery">
-    <p><em>Your videos will appear here.</em></p>
+  <div class="gallery"> <!-- Re-using gallery class for videos for now -->
+    <!-- Add your video embeds or links here -->
+    <!-- Example (placeholder): -->
+    <!-- <div class="video-placeholder">Video 1</div> -->
+    <!-- <div class="video-placeholder">Video 2</div> -->
+    <p><em>Your videos will appear here. You'll need to decide how to embed them (e.g., YouTube, Vimeo, or direct HTML5 video tags after uploading to <code>/assets/videos/</code>).</em></p>
   </div>
 </div>
-
-<!-- Simple Lightbox Structure -->
 <div id="lightbox-overlay" class="lightbox-hidden">
-  <span id="lightbox-close" class="lightbox-close-btn">×</span>
+  <span class="lightbox-close-btn">×</span>
   <img id="lightbox-image" src="" alt="Enlarged photo">
 </div>
-
 <script>
-// Same JavaScript as before
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // --- Photo/Video Switcher Logic ---
     const photosBtn = document.getElementById('show-photos-btn');
     const videosBtn = document.getElementById('show-videos-btn');
     const photosContent = document.getElementById('photos-content');
     const videosContent = document.getElementById('videos-content');
+if (photosBtn && videosBtn && photosContent && videosContent) { // Check all exist
+    photosContent.style.display = 'block';
+    videosContent.style.display = 'none';
+    photosBtn.classList.add('active');
+    videosBtn.classList.remove('active');
 
-    if (photosBtn && videosBtn && photosContent && videosContent) {
+    photosBtn.addEventListener('click', function() {
         photosContent.style.display = 'block';
         videosContent.style.display = 'none';
         photosBtn.classList.add('active');
         videosBtn.classList.remove('active');
+    });
 
-        photosBtn.addEventListener('click', function() {
-            photosContent.style.display = 'block';
-            videosContent.style.display = 'none';
-            photosBtn.classList.add('active');
-            videosBtn.classList.remove('active');
-        });
-        videosBtn.addEventListener('click', function() {
-            photosContent.style.display = 'none';
-            videosContent.style.display = 'block';
-            photosBtn.classList.remove('active');
-            videosBtn.classList.add('active');
-        });
+    videosBtn.addEventListener('click', function() {
+        photosContent.style.display = 'none';
+        videosContent.style.display = 'block';
+        photosBtn.classList.remove('active');
+        videosBtn.classList.add('active');
+    });
+}
+
+// --- Lightbox Functionality ---
+const lightboxOverlay = document.getElementById('lightbox-overlay');
+const lightboxImage = document.getElementById('lightbox-image');
+const lightboxCloseBtn = document.querySelector('.lightbox-close-btn');
+const photoGallery = document.querySelector('#photos-content .gallery');
+
+function openLightbox(imgSrc) {
+    if (lightboxImage && lightboxOverlay) {
+        lightboxImage.setAttribute('src', imgSrc);
+        lightboxOverlay.classList.add('lightbox-visible');
+        // lightboxOverlay.classList.remove('lightbox-hidden'); // CSS handles visibility via opacity
     }
+}
 
-    // --- Simple Lightbox Functionality ---
-    const lightboxOverlay = document.getElementById('lightbox-overlay');
-    const lightboxImage = document.getElementById('lightbox-image');
-    const lightboxCloseBtn = document.getElementById('lightbox-close');
-    const photoGallery = document.querySelector('#photos-content .gallery');
-
-    function openLightbox(imgSrc) {
-        if (lightboxImage && lightboxOverlay) {
-            lightboxImage.setAttribute('src', imgSrc);
-            lightboxOverlay.classList.add('lightbox-visible');
-        }
-    }
-
-    function closeLightbox() {
-        if (lightboxOverlay) {
-            lightboxOverlay.classList.remove('lightbox-visible');
-        }
-    }
-
-    if (photoGallery) {
-        photoGallery.addEventListener('click', function(event) {
-            if (event.target.tagName === 'IMG') {
-                event.preventDefault();
-                openLightbox(event.target.getAttribute('src'));
-            }
-        });
-    }
-
-    if (lightboxCloseBtn) {
-        lightboxCloseBtn.addEventListener('click', closeLightbox);
-    }
-    
+function closeLightbox() {
     if (lightboxOverlay) {
-        lightboxOverlay.addEventListener('click', function(event) {
-            if (event.target === lightboxOverlay) { 
-                closeLightbox();
-            }
-        });
+        lightboxOverlay.classList.remove('lightbox-visible');
+        // lightboxOverlay.classList.add('lightbox-hidden'); // CSS handles visibility via opacity
+        // Optional: Clear the image src to prevent loading an old image next time
+        // lightboxImage.setAttribute('src', ''); 
     }
+}
 
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
+if (photoGallery) {
+    photoGallery.addEventListener('click', function(event) {
+        if (event.target.tagName === 'IMG') {
+            openLightbox(event.target.getAttribute('src'));
+        }
+    });
+}
+
+if (lightboxCloseBtn) {
+    lightboxCloseBtn.addEventListener('click', closeLightbox);
+}
+
+if (lightboxOverlay) {
+    lightboxOverlay.addEventListener('click', function(event) {
+        if (event.target === lightboxOverlay) { 
             closeLightbox();
         }
     });
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
+        closeLightbox();
+    }
 });
-</script>
+  </script>  
