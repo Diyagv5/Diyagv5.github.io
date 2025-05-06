@@ -77,12 +77,33 @@ main.container-md {
   }
 
   /* Improved Gallery Styles */
+/* Default for mobile (smallest screens first - mobile-first approach) */
 .gallery {
-  column-count: 4; /* Start with 4 columns, adjust as needed */
-  column-gap: 10px; /* Space between columns */
-  padding: 10px; /* Padding around the gallery */
+  column-count: 2; /* e.g., 2 columns on small screens - YOU CAN CHANGE THIS TO 1 IF YOU PREFER */
+  column-gap: 10px;
+  /* padding: 10px; -- The .content-section already has padding, this might be redundant */
 }
 
+/* Medium screens (e.g., tablets) */
+@media (min-width: 768px) {
+  .gallery {
+    column-count: 3; /* 3 columns for tablets */
+  }
+}
+
+/* Large screens (e.g., desktops) */
+@media (min-width: 992px) {
+  .gallery {
+    column-count: 4; /* 4 columns for desktops */
+  }
+}
+
+/* Extra large screens (optional) */
+@media (min-width: 1200px) {
+  .gallery {
+    column-count: 5; /* 5 columns for very wide screens */
+  }
+}
 .gallery img {
   width: 100%; /* Image will fill the width of its column */
   height: auto;  /* Height will adjust to maintain aspect ratio */
@@ -95,8 +116,8 @@ main.container-md {
 
 /* For the hover effect */
 .gallery img:hover {
-  transform: scale(1.45); /* Make image 105% of its size on hover */
-  box-shadow: 0 4px 8px rgba(1,0,0,0.2); /* Optional: add a slight shadow */
+  transform: scale(1.07); /* Make image 105% of its size on hover */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Optional: add a slight shadow */
   z-index: 10; /* Optional: bring it to the front if overlapping */
   position: relative; /* Needed for z-index to work properly in some cases */
 }
