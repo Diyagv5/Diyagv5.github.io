@@ -1,3 +1,4 @@
+
 ---
 layout: page
 title: hehehee # Or your preferred site title
@@ -21,7 +22,7 @@ subtitle: " "
   /* --- Cover Section (Commented out as per your "no cover image" request) --- */
   /*
   .cover-section {
-    height: 70vh; 
+    height: 70vh;
     background-size: cover;
     background-position: center center;
     display: flex;
@@ -29,7 +30,7 @@ subtitle: " "
     justify-content: center;
     text-align: center;
     color: white;
-    background-image: url(''); 
+    background-image: url('');
   }
   .cover-section h1 {
     font-size: 3em;
@@ -65,29 +66,62 @@ subtitle: " "
     max-width: none;
     width: 100%;
   }
-  #photos-content {} 
+  #photos-content {}
   #videos-content { display: none; }
 
-  /* --- Gallery Styles --- */
-  .gallery { 
-    column-count: 2;
-    column-gap: 10px;
+  /* --- Gallery Styles (FOR MASONRY) --- */
+  .gallery {
+    /* Removed CSS column properties */
+    margin: 0 auto; /* Optional: centers the gallery if it's not full width due to item calculations */
   }
-  @media (min-width: 768px) { .gallery { column-count: 3; } }
-  @media (min-width: 992px) { .gallery { column-count: 4; } }
-  @media (min-width: 1200px) { .gallery { column-count: 5; } }
 
-  .gallery img {
-    width: 100%;
+  /*
+    Define the width of the Sizer and Grid Items.
+    These percentages determine how many columns you'll have.
+    Gutter will be handled by Masonry's JS option.
+  */
+  .grid-sizer,
+  .grid-item {
+    box-sizing: border-box;
+    /* Default to 2 columns on small screens */
+    width: 50%; /* (100% / 2 columns) */
+  }
+
+  @media (min-width: 768px) { /* 3 columns */
+    .grid-sizer,
+    .grid-item {
+      width: 33.333%; /* (100% / 3 columns) */
+    }
+  }
+  @media (min-width: 992px) { /* 4 columns */
+    .grid-sizer,
+    .grid-item {
+      width: 25%; /* (100% / 4 columns) */
+    }
+  }
+  @media (min-width: 1200px) { /* 5 columns */
+    .grid-sizer,
+    .grid-item {
+      width: 20%; /* (100% / 5 columns) */
+    }
+  }
+
+  .grid-item {
+    margin-bottom: 10px; /* Vertical spacing between items */
+    float: left; /* Important for Masonry with percentage widths */
+  }
+
+  .grid-item img {
+    display: block; /* Remove any extra space below the image */
+    width: 100%;   /* Image takes full width of its .grid-item parent */
     height: auto;
-    display: block;
-    margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     transition: transform 0.3s ease-in-out;
-    cursor: pointer; /* Added for better UX */
+    cursor: pointer;
   }
-  .gallery img:hover {
+
+  .grid-item img:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     z-index: 10;
@@ -122,10 +156,10 @@ subtitle: " "
     border: 3px solid white;
     box-shadow: 0 0 25px rgba(0,0,0,0.5);
   }
-  .lightbox-close-btn { 
+  .lightbox-close-btn {
     position: absolute;
-    top: 15px; /* Adjusted slightly from your previous 20px */
-    right: 25px; /* Adjusted slightly from your previous 30px */
+    top: 15px;
+    right: 25px;
     font-size: 40px;
     color: white;
     cursor: pointer;
@@ -150,12 +184,15 @@ subtitle: " "
 
 <div id="photos-content" class="content-section">
   <h2>Photos</h2>
-  <div class="gallery">
+  <div class="gallery"> <!-- This is the Masonry container -->
+    <div class="grid-sizer"></div> <!-- Masonry sizer element -->
     {% assign image_files = site.static_files | where_exp: "item", "item.path contains '/assets/img/'" %}
     {% assign image_files_sorted = image_files | sort: "name" %}
     {% for image in image_files_sorted %}
       {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
-        <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
+        <div class="grid-item"> <!-- Masonry item wrapper -->
+          <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
+        </div>
       {% endif %}
     {% endfor %}
     {% if image_files.size == 0 %}
@@ -166,16 +203,20 @@ subtitle: " "
 
 <div id="videos-content" class="content-section">
   <h2>Videos</h2>
-  <div class="gallery">
+  <div class="gallery"> <!-- You might want a different class/structure for videos if they aren't image-based masonry -->
     <p><em>Ayinilla.</em></p>
   </div>
 </div>
 
 <!-- Simple Lightbox Structure - ONLY ONE INSTANCE OF THIS -->
 <div id="lightbox-overlay" class="lightbox-hidden">
-  <span id="lightbox-close" class="lightbox-close-btn">×</span> <!-- Gave this an ID for JS -->
+  <span id="lightbox-close" class="lightbox-close-btn">×</span>
   <img id="lightbox-image" src="" alt="Enlarged photo">
 </div>
+
+<!-- Add Masonry and imagesLoaded Libraries -->
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -184,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const videosBtn = document.getElementById('show-videos-btn');
     const photosContent = document.getElementById('photos-content');
     const videosContent = document.getElementById('videos-content');
+    let msnry; // Declare msnry variable to be accessible by switcher
 
     if (photosBtn && videosBtn && photosContent && videosContent) {
         photosContent.style.display = 'block';
@@ -196,6 +238,10 @@ document.addEventListener('DOMContentLoaded', function() {
             videosContent.style.display = 'none';
             photosBtn.classList.add('active');
             videosBtn.classList.remove('active');
+            // Re-layout Masonry if it was hidden and now shown
+            if (msnry) {
+                msnry.layout();
+            }
         });
         videosBtn.addEventListener('click', function() {
             photosContent.style.display = 'none';
@@ -205,13 +251,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Simple Lightbox Functionality (Corrected) ---
+    // --- Masonry Initialization ---
+    const photoGalleryElem = document.querySelector('#photos-content .gallery');
+
+    if (photoGalleryElem) {
+        imagesLoaded(photoGalleryElem, function() {
+            // Initialize Masonry after all images have loaded
+            msnry = new Masonry(photoGalleryElem, {
+                itemSelector: '.grid-item',
+                columnWidth: '.grid-sizer',
+                gutter: 10, // Horizontal space between items (in pixels)
+                percentPosition: true, // Enables item positions to be percentages, good for responsive
+                // fitWidth: true // Uncomment if you want the gallery to be centered within its container
+            });
+        });
+    } else {
+        console.error("Photo gallery element for Masonry not found.");
+    }
+
+    // --- Simple Lightbox Functionality ---
     const lightboxOverlay = document.getElementById('lightbox-overlay');
     const lightboxImage = document.getElementById('lightbox-image');
-    const lightboxCloseBtn = document.getElementById('lightbox-close'); // Use ID to select
-    const photoGallery = document.querySelector('#photos-content .gallery');
+    const lightboxCloseBtn = document.getElementById('lightbox-close');
+    // photoGalleryElem is already defined for Masonry, we can reuse it if it exists
+    // const photoGallery = document.querySelector('#photos-content .gallery'); // Redundant if photoGalleryElem is used
 
-    // ** THIS FUNCTION WAS MISSING IN YOUR LAST PASTED JS **
     function openLightbox(imgSrc) {
         if (lightboxImage && lightboxOverlay) {
             lightboxImage.setAttribute('src', imgSrc);
@@ -224,15 +288,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeLightbox() {
         if (lightboxOverlay) {
             lightboxOverlay.classList.remove('lightbox-visible');
-            // Optional: Clear the image src after closing
-            // if (lightboxImage) lightboxImage.setAttribute('src', ''); 
         }
     }
 
-    if (photoGallery) {
-        photoGallery.addEventListener('click', function(event) {
-            if (event.target.tagName === 'IMG') {
-                event.preventDefault(); // Good practice
+    if (photoGalleryElem) { // Re-use the selector from Masonry
+        photoGalleryElem.addEventListener('click', function(event) {
+            // Check if the clicked element is an IMG within a .grid-item
+            if (event.target.tagName === 'IMG' && event.target.closest('.grid-item')) {
+                event.preventDefault();
                 openLightbox(event.target.getAttribute('src'));
             }
         });
@@ -245,10 +308,10 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error("Lightbox close button not found.");
     }
-    
+
     if (lightboxOverlay) {
         lightboxOverlay.addEventListener('click', function(event) {
-            if (event.target === lightboxOverlay) { 
+            if (event.target === lightboxOverlay) {
                 closeLightbox();
             }
         });
