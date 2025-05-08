@@ -18,24 +18,8 @@ subtitle: " "
     max-width: none !important;
   }
 
-  /* --- Cover Section (Commented out as per your "no cover image" request) --- */
-  /*
-  .cover-section {
-    height: 70vh;
-    background-size: cover;
-    background-position: center center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-    background-image: url('');
-  }
-  .cover-section h1 {
-    font-size: 3em;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-  }
-  */
+  /* --- Cover Section (Commented out) --- */
+  /* ... */
 
   /* --- Content Switcher --- */
   .content-switcher {
@@ -70,49 +54,40 @@ subtitle: " "
 
   /* --- Gallery Styles (FOR MASONRY) --- */
   .gallery {
-    /* Removed CSS column properties */
-    margin: 0 auto; /* Optional: centers the gallery if it's not full width due to item calculations */
+    margin: 0 auto;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.4s ease-in-out; /* Smooth fade-in */
   }
 
-  /*
-    Define the width of the Sizer and Grid Items.
-    These percentages determine how many columns you'll have.
-    Gutter will be handled by Masonry's JS option.
-  */
+  .gallery.masonry-loaded {
+    opacity: 1; /* Reveal when Masonry is ready */
+  }
+
   .grid-sizer,
   .grid-item {
     box-sizing: border-box;
-    /* Default to 2 columns on small screens */
-    width: 50%; /* (100% / 2 columns) */
+    width: 50%;
   }
 
-  @media (min-width: 768px) { /* 3 columns */
-    .grid-sizer,
-    .grid-item {
-      width: 33.333%; /* (100% / 3 columns) */
-    }
+  @media (min-width: 768px) {
+    .grid-sizer, .grid-item { width: 33.333%; }
   }
-  @media (min-width: 992px) { /* 4 columns */
-    .grid-sizer,
-    .grid-item {
-      width: 25%; /* (100% / 4 columns) */
-    }
+  @media (min-width: 992px) {
+    .grid-sizer, .grid-item { width: 25%; }
   }
-  @media (min-width: 1200px) { /* 5 columns */
-    .grid-sizer,
-    .grid-item {
-      width: 20%; /* (100% / 5 columns) */
-    }
+  @media (min-width: 1200px) {
+    .grid-sizer, .grid-item { width: 20%; }
   }
 
   .grid-item {
-    margin-bottom: 10px; /* Vertical spacing between items */
-    float: left; /* Important for Masonry with percentage widths */
+    margin-bottom: 10px;
+    float: left;
+    overflow: hidden; /* Helps contain images before Masonry sizes them */
   }
 
   .grid-item img {
-    display: block; /* Remove any extra space below the image */
-    width: 100%;   /* Image takes full width of its .grid-item parent */
+    display: block;
+    width: 100%;
     height: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -127,54 +102,37 @@ subtitle: " "
     position: relative;
   }
 
-  /* --- Simple Lightbox Styles (Corrected Transition) --- */
+  /* --- Simple Lightbox Styles --- */
   #lightbox-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s 0.3s; /* Corrected */
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
   }
   #lightbox-overlay.lightbox-visible {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease, visibility 0s 0s; /* Corrected */
+    opacity: 1; visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s 0s;
   }
   #lightbox-image {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 90%; max-height: 90%;
     object-fit: contain;
     border: 3px solid white;
     box-shadow: 0 0 25px rgba(0,0,0,0.5);
   }
   .lightbox-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    font-size: 40px;
-    color: white;
-    cursor: pointer;
-    line-height: 1;
-    user-select: none;
+    position: absolute; top: 15px; right: 25px;
+    font-size: 40px; color: white; cursor: pointer;
+    line-height: 1; user-select: none;
   }
 
-  .video-placeholder { /* ... your video placeholder styles ... */ }
+  .video-placeholder { /* ... */ }
 </style>
 
 <!-- Cover Section HTML (Commented out) -->
-<!--
-<div class="cover-section">
-  <h1>DnA</h1>
-</div>
--->
+<!-- ... -->
 
 <div class="content-switcher">
   <button id="show-photos-btn" class="active">Photos</button>
@@ -183,13 +141,13 @@ subtitle: " "
 
 <div id="photos-content" class="content-section">
   <h2>Photos</h2>
-  <div class="gallery"> <!-- This is the Masonry container -->
-    <div class="grid-sizer"></div> <!-- Masonry sizer element -->
+  <div class="gallery">
+    <div class="grid-sizer"></div>
     {% assign image_files = site.static_files | where_exp: "item", "item.path contains '/assets/img/'" %}
     {% assign image_files_sorted = image_files | sort: "name" %}
     {% for image in image_files_sorted %}
       {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
-        <div class="grid-item"> <!-- Masonry item wrapper -->
+        <div class="grid-item">
           <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
         </div>
       {% endif %}
@@ -202,29 +160,26 @@ subtitle: " "
 
 <div id="videos-content" class="content-section">
   <h2>Videos</h2>
-  <div class="gallery"> <!-- You might want a different class/structure for videos if they aren't image-based masonry -->
+  <div class="gallery">
     <p><em>Ayinilla.</em></p>
   </div>
 </div>
 
-<!-- Simple Lightbox Structure - ONLY ONE INSTANCE OF THIS -->
 <div id="lightbox-overlay" class="lightbox-hidden">
   <span id="lightbox-close" class="lightbox-close-btn">×</span>
   <img id="lightbox-image" src="" alt="Enlarged photo">
 </div>
 
-<!-- Add Masonry and imagesLoaded Libraries -->
 <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Photo/Video Switcher Logic ---
     const photosBtn = document.getElementById('show-photos-btn');
     const videosBtn = document.getElementById('show-videos-btn');
     const photosContent = document.getElementById('photos-content');
     const videosContent = document.getElementById('videos-content');
-    let msnry; // Declare msnry variable to be accessible by switcher
+    let msnry;
 
     if (photosBtn && videosBtn && photosContent && videosContent) {
         photosContent.style.display = 'block';
@@ -237,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
             videosContent.style.display = 'none';
             photosBtn.classList.add('active');
             videosBtn.classList.remove('active');
-            // Re-layout Masonry if it was hidden and now shown
             if (msnry) {
                 msnry.layout();
             }
@@ -250,30 +204,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Masonry Initialization ---
     const photoGalleryElem = document.querySelector('#photos-content .gallery');
 
     if (photoGalleryElem) {
         imagesLoaded(photoGalleryElem, function() {
-            // Initialize Masonry after all images have loaded
             msnry = new Masonry(photoGalleryElem, {
                 itemSelector: '.grid-item',
                 columnWidth: '.grid-sizer',
-                gutter: 10, // Horizontal space between items (in pixels)
-                percentPosition: true, // Enables item positions to be percentages, good for responsive
-                // fitWidth: true // Uncomment if you want the gallery to be centered within its container
+                gutter: 10,
+                percentPosition: true,
             });
+            // Add the class to reveal the gallery
+            photoGalleryElem.classList.add('masonry-loaded');
         });
     } else {
         console.error("Photo gallery element for Masonry not found.");
     }
 
-    // --- Simple Lightbox Functionality ---
     const lightboxOverlay = document.getElementById('lightbox-overlay');
     const lightboxImage = document.getElementById('lightbox-image');
     const lightboxCloseBtn = document.getElementById('lightbox-close');
-    // photoGalleryElem is already defined for Masonry, we can reuse it if it exists
-    // const photoGallery = document.querySelector('#photos-content .gallery'); // Redundant if photoGalleryElem is used
 
     function openLightbox(imgSrc) {
         if (lightboxImage && lightboxOverlay) {
@@ -290,9 +240,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (photoGalleryElem) { // Re-use the selector from Masonry
+    if (photoGalleryElem) {
         photoGalleryElem.addEventListener('click', function(event) {
-            // Check if the clicked element is an IMG within a .grid-item
             if (event.target.tagName === 'IMG' && event.target.closest('.grid-item')) {
                 event.preventDefault();
                 openLightbox(event.target.getAttribute('src'));
@@ -304,20 +253,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (lightboxCloseBtn) {
         lightboxCloseBtn.addEventListener('click', closeLightbox);
-    } else {
-        console.error("Lightbox close button not found.");
     }
-
     if (lightboxOverlay) {
         lightboxOverlay.addEventListener('click', function(event) {
             if (event.target === lightboxOverlay) {
                 closeLightbox();
             }
         });
-    } else {
-        console.error("Lightbox overlay element not found.");
     }
-
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && lightboxOverlay && lightboxOverlay.classList.contains('lightbox-visible')) {
             closeLightbox();
@@ -325,3 +268,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+  
