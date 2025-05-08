@@ -19,7 +19,23 @@ subtitle: " "
   }
 
   /* --- Cover Section (Commented out) --- */
-  /* ... */
+  /*
+  .cover-section {
+    height: 70vh;
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    background-image: url('');
+  }
+  .cover-section h1 {
+    font-size: 3em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  }
+  */
 
   /* --- Content Switcher --- */
   .content-switcher {
@@ -59,35 +75,45 @@ subtitle: " "
     transition: opacity 0.4s ease-in-out; /* Smooth fade-in */
   }
 
-  .gallery.masonry-loaded {
-    opacity: 1; /* Reveal when Masonry is ready */
+  .gallery.initial-load-complete { /* Changed class name for revealing after initial batch */
+    opacity: 1; /* Reveal when initial Masonry is ready */
   }
 
   .grid-sizer,
   .grid-item {
     box-sizing: border-box;
+    /* Default to 2 columns on small screens */
     width: 50%;
   }
 
-  @media (min-width: 768px) {
-    .grid-sizer, .grid-item { width: 33.333%; }
+  @media (min-width: 768px) { /* 3 columns */
+    .grid-sizer,
+    .grid-item {
+      width: 33.333%;
+    }
   }
-  @media (min-width: 992px) {
-    .grid-sizer, .grid-item { width: 25%; }
+  @media (min-width: 992px) { /* 4 columns */
+    .grid-sizer,
+    .grid-item {
+      width: 25%;
+    }
   }
-  @media (min-width: 1200px) {
-    .grid-sizer, .grid-item { width: 20%; }
+  @media (min-width: 1200px) { /* 5 columns */
+    .grid-sizer,
+    .grid-item {
+      width: 20%;
+    }
   }
 
   .grid-item {
-    margin-bottom: 10px;
-    float: left;
+    margin-bottom: 10px; /* Vertical spacing between items */
+    float: left; /* Important for Masonry with percentage widths */
     overflow: hidden; /* Helps contain images before Masonry sizes them */
   }
 
   .grid-item img {
-    display: block;
-    width: 100%;
+    display: block; /* Remove any extra space below the image */
+    width: 100%;   /* Image takes full width of its .grid-item parent */
     height: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -128,11 +154,15 @@ subtitle: " "
     line-height: 1; user-select: none;
   }
 
-  .video-placeholder { /* ... */ }
+  .video-placeholder { /* ... your video placeholder styles ... */ }
 </style>
 
 <!-- Cover Section HTML (Commented out) -->
-<!-- ... -->
+<!--
+<div class="cover-section">
+  <h1>DnA</h1>
+</div>
+-->
 
 <div class="content-switcher">
   <button id="show-photos-btn" class="active">Photos</button>
@@ -141,14 +171,15 @@ subtitle: " "
 
 <div id="photos-content" class="content-section">
   <h2>Photos</h2>
-  <div class="gallery">
-    <div class="grid-sizer"></div>
+  <div class="gallery"> <!-- This is the Masonry container -->
+    <div class="grid-sizer"></div> <!-- Masonry sizer element -->
     {% assign image_files = site.static_files | where_exp: "item", "item.path contains '/assets/img/'" %}
     {% assign image_files_sorted = image_files | sort: "name" %}
-    {% for image in image_files_sorted %}
-      {% if image.path contains '.jpg' or image.path contains '.jpeg' or image.path contains '.png' or image.path contains '.gif' %}
-        <div class="grid-item">
-          <img loading="lazy" src="{{ image.path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image.name | remove_first: '/assets/img/' }}">
+    {% for image_path_obj in image_files_sorted %}
+      {% assign image_path = image_path_obj.path %}
+      {% if image_path contains '.jpg' or image_path contains '.jpeg' or image_path contains '.png' or image_path contains '.gif' %}
+        <div class="grid-item"> <!-- Masonry item wrapper -->
+          <img loading="lazy" src="{{ image_path | relative_url }}" alt="Photo {{ forloop.index }} - {{ image_path_obj.name | remove_first: '/assets/img/' }}">
         </div>
       {% endif %}
     {% endfor %}
@@ -160,21 +191,24 @@ subtitle: " "
 
 <div id="videos-content" class="content-section">
   <h2>Videos</h2>
-  <div class="gallery">
+  <div class="gallery"> <!-- You might want a different class/structure for videos if they aren't image-based masonry -->
     <p><em>Ayinilla.</em></p>
   </div>
 </div>
 
+<!-- Simple Lightbox Structure - ONLY ONE INSTANCE OF THIS -->
 <div id="lightbox-overlay" class="lightbox-hidden">
   <span id="lightbox-close" class="lightbox-close-btn">×</span>
   <img id="lightbox-image" src="" alt="Enlarged photo">
 </div>
 
+<!-- Add Masonry and imagesLoaded Libraries -->
 <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Photo/Video Switcher Logic ---
     const photosBtn = document.getElementById('show-photos-btn');
     const videosBtn = document.getElementById('show-videos-btn');
     const photosContent = document.getElementById('photos-content');
@@ -204,23 +238,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- Masonry Initialization with Staged Loading ---
     const photoGalleryElem = document.querySelector('#photos-content .gallery');
 
     if (photoGalleryElem) {
-        imagesLoaded(photoGalleryElem, function() {
-            msnry = new Masonry(photoGalleryElem, {
-                itemSelector: '.grid-item',
-                columnWidth: '.grid-sizer',
-                gutter: 10,
-                percentPosition: true,
+        const allGridItems = Array.from(photoGalleryElem.querySelectorAll('.grid-item'));
+        const initialLoadCount = 50; // Number of images to load eagerly
+
+        const initialGridItems = allGridItems.slice(0, initialLoadCount);
+        const deferredGridItems = allGridItems.slice(initialLoadCount);
+
+        const initialImages = initialGridItems.map(item => item.querySelector('img')).filter(img => img);
+
+        if (initialImages.length > 0) {
+            imagesLoaded(initialImages, function() {
+                msnry = new Masonry(photoGalleryElem, {
+                    itemSelector: '.grid-item',
+                    columnWidth: '.grid-sizer',
+                    gutter: 10,
+                    percentPosition: true,
+                });
+                photoGalleryElem.classList.add('initial-load-complete');
+                console.log(`Initial ${initialImages.length} images loaded and Masonry initialized.`);
+
+                if (deferredGridItems.length > 0) {
+                    const deferredImages = deferredGridItems.map(item => item.querySelector('img')).filter(img => img);
+                    imagesLoaded(deferredImages, function() {
+                        console.log("Deferred images have loaded. Re-layouting Masonry.");
+                        if (msnry) {
+                            msnry.layout();
+                        }
+                    });
+                }
             });
-            // Add the class to reveal the gallery
-            photoGalleryElem.classList.add('masonry-loaded');
-        });
+        } else if (allGridItems.length > 0) { // Fewer than initialLoadCount images, or no initial images but some grid items
+            const allImages = allGridItems.map(item => item.querySelector('img')).filter(img => img);
+            if (allImages.length > 0) {
+                imagesLoaded(allImages, function() {
+                     msnry = new Masonry(photoGalleryElem, {
+                        itemSelector: '.grid-item',
+                        columnWidth: '.grid-sizer',
+                        gutter: 10,
+                        percentPosition: true,
+                    });
+                    photoGalleryElem.classList.add('initial-load-complete');
+                     console.log(`All images (${allImages.length}) loaded and Masonry initialized.`);
+                });
+            } else {
+                 photoGalleryElem.classList.add('initial-load-complete'); // Show "No photos" if it's the only content
+            }
+        } else { // No .grid-item elements found at all
+             photoGalleryElem.classList.add('initial-load-complete'); // Ensure gallery becomes visible for "No photos" message
+        }
     } else {
         console.error("Photo gallery element for Masonry not found.");
     }
 
+    // --- Simple Lightbox Functionality ---
     const lightboxOverlay = document.getElementById('lightbox-overlay');
     const lightboxImage = document.getElementById('lightbox-image');
     const lightboxCloseBtn = document.getElementById('lightbox-close');
@@ -248,7 +322,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     } else {
-        console.error("Photo gallery element not found for lightbox listener.");
+        // This case is already handled by the Masonry init, but good to be aware
+        // console.error("Photo gallery element not found for lightbox listener.");
     }
 
     if (lightboxCloseBtn) {
@@ -268,4 +343,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-  
